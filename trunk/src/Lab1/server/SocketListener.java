@@ -36,7 +36,7 @@ public class SocketListener {
 				
 	    		System.out.println("SocketListener successfully connected with a client.");
 	    		System.out.println("Client count: " + ++clientCount + '\n');
-	    		new Server().start(ConnectionToOneClient.);
+	    		new Server().start(ConnectionToOneClient.
 
 				ConnectionToOneClient.close();	//End of the conversation close the connection to the client
 			}
