@@ -33,7 +33,7 @@ public class ConnectionHandler implements Runnable{
 
 		try{
 			round = in.readInt();
-			System.out.println("Received Round Number" + round);
+			System.out.println("Received Round Number: " + round);
 		}catch(IOException io){
 			io.printStackTrace(); 
 			System.exit(1); 
