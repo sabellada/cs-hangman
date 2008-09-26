@@ -40,11 +40,11 @@ public class game extends JPanel{
 	 *          This method returns a String that should be send to gui.java
 	 *          Refer to the method 'public void resetGameBoard()' in gui.java
 	 */
-	public  String startNewGame(){
-		String theNewWordToGuess="";      
+//	public  String startNewGame(){
+//		String theNewWordToGuess="";      
 
-		return theNewWordToGuess;
-	}
+//		return theNewWordToGuess;
+//	}
 
 
 	// NO NEED TO MODIFY THE REMAINING OF THE CLASS
