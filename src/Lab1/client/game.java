@@ -43,8 +43,10 @@ public class game extends JPanel{
         String theNewWordToGuess="";
         try{
             
-            // update 'theNewWordToGuess' after contacting successfully the server
-            
+        	//Socket ConnectionToServer=new Socket();
+        	//DataInputStream in = new DataInputStream(ConnectionToServer.getInputStream());
+        	//theNewWordToGuess=in.readUTF();
+        	
         }catch(Exception e){
             // if you are here, something went wrong when contacting the server
             // it is likely that the process is not able to get the new word to guess

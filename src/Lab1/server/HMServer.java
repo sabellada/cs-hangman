@@ -17,7 +17,8 @@ public class HMServer {
 			// We need only one ServerSocket : FrontDesk is an open generic socket
 			// listening for request for connection from client processes.
 			
-			words myWord=new words();
+			WordsMonitor wordsMonitor=new WordsMonitor();
+			
 
 			while(true) {
 
@@ -27,7 +28,7 @@ public class HMServer {
 				System.out.println("Connect accepted");
 				// Accept the connect, a virtual channel is now set between the client and the server
 
-				Thread connection=new Thread( new ConnectionHandler(ConnectionToOneClient,myWord));
+				Thread connection=new Thread( new ConnectionHandler(ConnectionToOneClient, wordsMonitor));
 				connection.start();
 				
 				//       ConnectionToOneClient.close();	//End of the conversation close the connection to the client
