@@ -6,7 +6,7 @@
  * To change this template, choose Tools | Template Manager
  * and open the template in the editor.
  */
-
+//This class 
 package Lab1.client;
 import java.awt.*;
 import javax.swing.*;
@@ -47,7 +47,7 @@ public class game extends JPanel{
 //		return theNewWordToGuess;
 //	}
 
-
+	// NO	
 	// NO NEED TO MODIFY THE REMAINING OF THE CLASS
 	// ************************************************************************************
 	private static void createAndShowGUI() {        
