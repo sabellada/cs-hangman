@@ -37,7 +37,8 @@ public class HMServer {
 	}
 
 	public static void main (String args[]) throws Exception{
-
+		
+		//start server and listen for connections from clients
 		HMServer server=new HMServer();
 		server.listen();
 

@@ -22,7 +22,7 @@ public class ConnectionHandler implements Runnable{
 		in = new DataInputStream( ConnectionToOneClient.getInputStream());
 		out =new DataOutputStream( ConnectionToOneClient.getOutputStream());
 
-
+		//keep track of list of words
 		this.wordsMonitor=wordsMonitor;
 	}
 
@@ -32,6 +32,7 @@ public class ConnectionHandler implements Runnable{
 
 
 		try{
+			//get round from client
 			round = in.readInt();
 			System.out.println("Received Round Number: " + round);
 		}catch(IOException io){
@@ -40,11 +41,10 @@ public class ConnectionHandler implements Runnable{
 		}
 
 		try{
+			//get next word for round and send it to the client
 			String messageToClient = wordsMonitor.getNext(round);
 			System.out.println("The next word sent to client: " +  messageToClient);
 			out.writeUTF(messageToClient);
-
-
 		}catch(IOException io2){
 			io2.printStackTrace(); 
 			System.exit(1); 
