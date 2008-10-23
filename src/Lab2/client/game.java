@@ -7,7 +7,7 @@
  * and open the template in the editor.
  */
 //This class 
-package Lab1.client;
+package Lab2.client;
 import java.awt.*;
 import javax.swing.*;
 import java.net.*;
