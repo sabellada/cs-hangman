@@ -7,7 +7,7 @@
  * and open the template in the editor.
  */
 
-package Lab1.client;
+package Lab2.client;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;

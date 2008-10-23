@@ -1,4 +1,4 @@
-package Lab1.server;
+package Lab2.server;
 
 import java.util.*;
 
