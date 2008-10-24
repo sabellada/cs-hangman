@@ -11,6 +11,11 @@ package Lab2.client;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+
+import Lab2.Interface.scoreNotification;
+
 
 import gui.gameBoard;
 /**
@@ -34,15 +39,28 @@ public class gui extends gameBoard{
 
 	@Override
 	public void resetGameBoard() {
-		// clean up the previous game;
-		cleanUp();      
-
-		// set the new word
-		// BEGINING OF REQUIRED MODIFICATION ******************************
-		// contact the server in order to get the word to guess then assign
-		// the new word to the variable 'theWord';
-
 		try{
+			Registry registry = LocateRegistry.getRegistry("localhost",2009);
+			// create the object which is only the INTERFACE
+			// Note that the object is identified by its name 'myObjectName'
+			// which the name used by the server when binding it to the registry
+			scoreNotification obj = (scoreNotification)registry.lookup("myObjectName");
+			
+			obj.notify(getPlayerName(), getCurrentScore());
+			
+			updateAllPlayersScore(obj.scores());
+			
+			// clean up the previous game;
+			cleanUp();      
+
+			
+			
+			// set the new word
+			// BEGINING OF REQUIRED MODIFICATION ******************************
+			// contact the server in order to get the word to guess then assign
+			// the new word to the variable 'theWord';
+
+		
 			int serverPort = 4504;
 			System.out.println("Request to connect to server");
 			Socket s = new Socket("localhost", serverPort);  

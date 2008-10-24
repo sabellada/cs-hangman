@@ -5,12 +5,16 @@ import java.io.DataOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 
 import Lab2.Interface.scoreNotification;
 
+
 import server.words;
 
-public class HMServer implements scoreNotification {
+public class HMServer{
 
 	ScoreMonitor scoreMonitor=new ScoreMonitor();
 	WordsMonitor wordsMonitor=new WordsMonitor();
@@ -18,8 +22,16 @@ public class HMServer implements scoreNotification {
 	private void listen()throws Exception {
 
 		
+        // start the registry on port 1099
+        Registry reg = LocateRegistry.createRegistry(2009);            
+        //Create the object that will be invoked
+        ScoreUpdater obj = new ScoreUpdater(scoreMonitor);
+        //link it to its interface
+        scoreNotification objectInterface = (scoreNotification) UnicastRemoteObject.exportObject(obj,0);
+        // bind the object to the registry so that it can be invoked remotely
+        reg.bind("myObjectName",objectInterface);
 		
-		
+        
 		int serverPort = 4504; // the server port
 		ServerSocket FrontDesk = new ServerSocket(serverPort);
 		// We need only one ServerSocket : FrontDesk is an open generic socket
@@ -51,8 +63,5 @@ public class HMServer implements scoreNotification {
 
 	}
 
-	@Override
-	public void notify(String player, int score) throws RemoteException {
-		scoreMonitor.addScore(player, score);
-	}
+
 }
