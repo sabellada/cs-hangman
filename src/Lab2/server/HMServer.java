@@ -22,7 +22,7 @@ public class HMServer{
 	private void listen()throws Exception {
 
 		
-        // start the registry on port 2009
+        // start the registry on port 2010
         Registry reg = LocateRegistry.createRegistry(2010);            
         //Create the object that will be invoked
         ScoreUpdater obj = new ScoreUpdater(scoreMonitor);

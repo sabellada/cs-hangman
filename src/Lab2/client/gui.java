@@ -51,7 +51,7 @@ public class gui extends gameBoard{
 			// clean up the previous game;
 			cleanUp();      
 
-			 
+			System.out.println("Player, Score:");
 			System.out.println(obj.scores());
 			
 			
