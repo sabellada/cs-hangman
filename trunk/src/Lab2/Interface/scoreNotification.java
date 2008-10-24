@@ -11,4 +11,6 @@ package Lab2.Interface;
  */
 public interface scoreNotification extends java.rmi.Remote {
     void notify(String player, int score)throws java.rmi.RemoteException; 
+    
+    String scores();
 }
