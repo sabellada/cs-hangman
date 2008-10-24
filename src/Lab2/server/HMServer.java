@@ -23,7 +23,7 @@ public class HMServer{
 
 		
         // start the registry on port 2009
-        Registry reg = LocateRegistry.createRegistry(2009);            
+        Registry reg = LocateRegistry.createRegistry(2010);            
         //Create the object that will be invoked
         ScoreUpdater obj = new ScoreUpdater(scoreMonitor);
         //link it to its interface

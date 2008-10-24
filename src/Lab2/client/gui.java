@@ -40,20 +40,20 @@ public class gui extends gameBoard{
 	@Override
 	public void resetGameBoard() {
 		try{
-			Registry registry = LocateRegistry.getRegistry("localhost",2009);
+			Registry registry = LocateRegistry.getRegistry("localhost",2010);
 			// create the object which is only the INTERFACE
 			// Note that the object is identified by its name 'myObjectName'
 			// which the name used by the server when binding it to the registry
 			scoreNotification obj = (scoreNotification)registry.lookup("myObjectName");
 			
 			obj.notify(getPlayerName(), getCurrentScore());
-			
-			
-			
+					
 			// clean up the previous game;
 			cleanUp();      
 
-			updateAllPlayersScore(obj.scores());
+			 
+			System.out.println(obj.scores());
+			
 			
 			// set the new word
 			// BEGINING OF REQUIRED MODIFICATION ******************************
