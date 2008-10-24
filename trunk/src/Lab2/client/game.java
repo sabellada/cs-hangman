@@ -10,7 +10,11 @@
 package Lab2.client;
 import java.awt.*;
 import javax.swing.*;
+
+import Lab2.Interface.scoreNotification;
+
 import java.net.*;
+import java.rmi.RemoteException;
 import java.io.*;
 
 
@@ -18,7 +22,7 @@ import java.io.*;
  *
  * @author Jerome
  */
-public class game extends JPanel{
+public class game extends JPanel {
 
 	private gui myGameBoard;
 	private int roundsPlayed=0;
@@ -72,4 +76,6 @@ public class game extends JPanel{
 
 	}      
 	// ************************************************************************************
+
+
 }

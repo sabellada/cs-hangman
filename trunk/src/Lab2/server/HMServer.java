@@ -4,20 +4,27 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.rmi.RemoteException;
+
+import Lab2.Interface.scoreNotification;
 
 import server.words;
 
-public class HMServer {
+public class HMServer implements scoreNotification {
 
-	private void listen()throws Exception{
+	ScoreMonitor scoreMonitor=new ScoreMonitor();
+	WordsMonitor wordsMonitor=new WordsMonitor();
+	
+	private void listen()throws Exception {
 
-
+		
+		
+		
 		int serverPort = 4504; // the server port
 		ServerSocket FrontDesk = new ServerSocket(serverPort);
 		// We need only one ServerSocket : FrontDesk is an open generic socket
 		// listening for request for connection from client processes.
 
-		WordsMonitor wordsMonitor=new WordsMonitor();
 
 
 		while(true) {
@@ -42,5 +49,10 @@ public class HMServer {
 		HMServer server=new HMServer();
 		server.listen();
 
+	}
+
+	@Override
+	public void notify(String player, int score) throws RemoteException {
+		scoreMonitor.addScore(player, score);
 	}
 }
