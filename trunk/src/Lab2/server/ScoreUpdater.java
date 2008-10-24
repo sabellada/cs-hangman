@@ -20,7 +20,6 @@ public class ScoreUpdater implements scoreNotification{
 	//placeholder method to get scores, will be updated in lab 3
 	@Override
 	public String scores() {
-		// TODO Auto-generated method stub
 		return scoreMonitor.getScores();
 	}
 

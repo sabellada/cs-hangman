@@ -44,6 +44,7 @@ public class ConnectionHandler implements Runnable{
 			//get next word for round and send it to the client
 			String messageToClient = wordsMonitor.getNext(round);
 			System.out.println("The next word sent to client: " +  messageToClient);
+			
 			out.writeUTF(messageToClient);
 		}catch(IOException io2){
 			io2.printStackTrace(); 

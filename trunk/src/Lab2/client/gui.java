@@ -48,12 +48,12 @@ public class gui extends gameBoard{
 			
 			obj.notify(getPlayerName(), getCurrentScore());
 			
-			updateAllPlayersScore(obj.scores());
+			
 			
 			// clean up the previous game;
 			cleanUp();      
 
-			
+			updateAllPlayersScore(obj.scores());
 			
 			// set the new word
 			// BEGINING OF REQUIRED MODIFICATION ******************************

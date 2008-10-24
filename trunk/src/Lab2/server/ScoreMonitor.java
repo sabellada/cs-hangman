@@ -12,9 +12,7 @@ public class ScoreMonitor {
 
 
 	public synchronized void addScore(String player, int score){
-
-		scores.addRecord(player,score);			
-			
+		scores.addRecord(player,score);						
 	}
 
 	public synchronized String getScores(){
