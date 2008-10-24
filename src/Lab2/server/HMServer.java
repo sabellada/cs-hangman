@@ -22,7 +22,7 @@ public class HMServer{
 	private void listen()throws Exception {
 
 		
-        // start the registry on port 1099
+        // start the registry on port 2009
         Registry reg = LocateRegistry.createRegistry(2009);            
         //Create the object that will be invoked
         ScoreUpdater obj = new ScoreUpdater(scoreMonitor);
@@ -49,7 +49,7 @@ public class HMServer{
 
 			Thread connection=new Thread( new ConnectionHandler(ConnectionToOneClient, wordsMonitor));
 			connection.start();
-
+			
 			//ConnectionToOneClient.close();	//End of the conversation close the connection to the client
 		}
 
