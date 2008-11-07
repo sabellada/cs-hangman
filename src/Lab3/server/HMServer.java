@@ -1,4 +1,4 @@
-package Lab2.server;
+package Lab3.server;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
