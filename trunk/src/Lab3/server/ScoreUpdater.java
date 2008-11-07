@@ -18,12 +18,16 @@ public class ScoreUpdater implements scoreNotification{
 	@Override
 	public void notify(String player, int score) throws RemoteException {
 		scoreMonitor.addScore(player, score);
+		scoreMonitor.sendScores();
+		
+	}
+	@Override
+	public String scores() throws RemoteException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
-	//placeholder method to get scores, will be updated in lab 3
-	@Override
-	public String scores() {
-		return scoreMonitor.getScores();
-	}
+
+
 
 }
