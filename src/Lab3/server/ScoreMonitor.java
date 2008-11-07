@@ -46,7 +46,7 @@ public class ScoreMonitor {
 		        byte [] message = scores.getAllScores().getBytes();
 		        // Note that the message MUST contain the port on which the receivers
 		        // are listening.
-		        DatagramPacket messageToSend = new DatagramPacket(message, message.length, group, 4504);
+		        DatagramPacket messageToSend = new DatagramPacket(message, message.length, group, 6500);
 		        MulticastChannel.send(messageToSend);	
 		
 		        // if we did not join the group, then we must not call 'leaveGroup'
