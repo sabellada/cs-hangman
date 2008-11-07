@@ -21,7 +21,7 @@ public class HMServer{
 	
 	private void listen()throws Exception {
 
-		
+		/*-----------------Create RPC to handle score updates------------------*/
         // start the registry on port 2010
         Registry reg = LocateRegistry.createRegistry(2010);            
         //Create the object that will be invoked
@@ -30,7 +30,8 @@ public class HMServer{
         scoreNotification objectInterface = (scoreNotification) UnicastRemoteObject.exportObject(obj,0);
         // bind the object to the registry so that it can be invoked remotely
         reg.bind("myObjectName",objectInterface);
-		
+		/*----------------------END RPC creation--------------------------------*/
+        
         
 		int serverPort = 4504; // the server port
 		ServerSocket FrontDesk = new ServerSocket(serverPort);
