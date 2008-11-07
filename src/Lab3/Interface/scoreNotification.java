@@ -16,8 +16,5 @@ public interface scoreNotification extends java.rmi.Remote {
 	 */
     void notify(String player, int score)throws java.rmi.RemoteException; 
     
-    /*
-     * RPC to multicast the scores, implementation incomplete until lab 3
-     */
-    String scores()throws java.rmi.RemoteException;
+
 }
