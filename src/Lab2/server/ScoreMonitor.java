@@ -19,6 +19,7 @@ public class ScoreMonitor {
 	 */
 	public synchronized void addScore(String player, int score){
 		scores.addRecord(player,score);
+		
 	}
 	/*
 	 * returns the score of the round to the client
