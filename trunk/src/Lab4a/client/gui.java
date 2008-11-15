@@ -8,17 +8,12 @@
  */
 
 package Lab4a.client;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.InputStream;
-import java.net.Socket;
-import java.net.URL;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 
-import Lab2.Interface.scoreNotification;
-import Lab3.client.ScoreReader;
-import Lab3.server.ConnectionHandler;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+
+
 
 
 import gui.gameBoard;
@@ -47,46 +42,58 @@ public class gui extends gameBoard{
 	@Override
 	public void resetGameBoard() {
 		
-		try{
-
-			
-			
-			
+		try{						
 			// clean up the previous game;
-			cleanUp();      
-
-			//set the URL based on the current round
-			String wordURL=new String();
-			wordURL="http://www.deskteam.net/sysc4504/gameServer.jsp?games="+round;
-			
-			/*-------------------------GET WORD FROM URL----------------------------------------*/
-			URL url = new URL(wordURL);
-			InputStream in = url.openStream();
-				byte[] buffer = new byte[1096];
-				int receivedBytes;
-				String pageContent="";
-				
-				while( (receivedBytes=in.read(buffer)) != -1){
-					pageContent+=new String(buffer);
-				}
-			in.close();
-			/*-------------------------END GET WORD FROM URL----------------------------------------*/
-			
-			//set theWord to pageContent and trim null characters
-			theWord=parseWord(pageContent);
+			cleanUp();   
+  
+			getScores();
+			getWord();
 			
 			System.out.println("Received: "+ theWord) ; 
-			System.out.println("Current Round Number: "+ round) ;
-
-		
-			//display new word
-			setNewWord();  
+			System.out.println("Current Round Number: "+ round) ;		
 			//increment round
 			round++;
 		
 		}catch (Exception e) {System.out.println("Exception caught in Client " + e.getMessage());}
 	}
 	
+	private void getWord() throws IOException {
+		URL URL = new URL("http://www.deskteam.net/sysc4504/gameServer.jsp?games="+round);
+		InputStream in = URL.openStream();
+			byte[] buffer = new byte[1096];
+			int receivedBytes;
+			String pageContent="";
+			
+			while( (receivedBytes=in.read(buffer)) != -1){
+				pageContent+=new String(buffer);
+			}
+		in.close();
+		
+		//set theWord to pageContent and trim null characters
+		theWord=parseWord(pageContent);
+		//display new word
+		setNewWord(); 
+		
+	}
+
+
+
+	private void getScores() throws IOException {
+		 URL url = new URL("http://www.deskteam.net/sysc4504/gameServer.jsp??player="+getPlayerName()+"&score="+getCurrentScore());
+			 InputStream in = url.openStream();
+			 byte[] buffer = new byte[1096];
+			 int receivedBytes;
+			 String pageContent="";
+			 while( (receivedBytes=in.read(buffer)) != -1){
+				 pageContent+=new String(buffer);
+			 }
+			 in.close();
+			 updateAllPlayersScore(parseWord(pageContent)) ;
+
+		
+	}
+
+
 	/*
 	 * parses the word from the full page content
 	 * @param pageContent - the full page content
