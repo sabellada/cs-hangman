@@ -40,6 +40,7 @@ public class gui extends gameBoard{
 		Thread scoreReader=new Thread( new ScoreReader(this));
 		scoreReader.start();
 		
+		
 	}
 	
 	
@@ -57,7 +58,7 @@ public class gui extends gameBoard{
 			
 			obj.notify(getPlayerName(), getCurrentScore());
 			/*----------------------END of RPC---------------------------------*/
-			
+		}catch (Exception e) {}
 			
 			// clean up the previous game;
 			cleanUp();      
@@ -68,7 +69,7 @@ public class gui extends gameBoard{
 			// contact the server in order to get the word to guess then assign
 			// the new word to the variable 'theWord';
 
-		
+		try{
 			int serverPort = 4504;
 			System.out.println("Request to connect to server");
 			Socket s = new Socket("localhost", serverPort);  
@@ -96,7 +97,23 @@ public class gui extends gameBoard{
 			System.out.println("Current Round Number: "+ round) ;
 			/*-----------------------END connect to server--------------------*/
 
-		}catch (Exception e) {System.out.println("Exception caught in Client " + e.getMessage());}
+		}catch (Exception e) {
+			
+			//Multicast that server has failed
+			//send round number+port number etc
+			//get all other processes round+port etc
+			//figure out which process is the new server
+			
+			//if this process is the new server
+			//scan for server restarting
+			//if server has restarted
+			//
+			//disable new words
+			
+			//else if other process is new server
+			//notify new process 
+			//switch this processes server info to match the new server
+		}
 
 
 		// END OF REQUIRED MODIFICATION ***********************************
