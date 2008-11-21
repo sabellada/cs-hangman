@@ -79,7 +79,7 @@ public class gui extends gameBoard{
 
 
 	private void getScores() throws IOException {
-		 URL url = new URL("http://www.deskteam.net/sysc4504/gameServer.jsp??player="+getPlayerName()+"&score="+getCurrentScore());
+		 URL url = new URL("http://www.deskteam.net/sysc4504/gameServer.jsp?player="+getPlayerName()+"&score="+getCurrentScore());
 			 InputStream in = url.openStream();
 			 byte[] buffer = new byte[1096];
 			 int receivedBytes;
