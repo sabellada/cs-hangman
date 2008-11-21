@@ -27,6 +27,7 @@ public class gui extends gameBoard{
 	// this class must extend gameBoard
 	private int round = 0;
 
+	private boolean serverDown;
 	/** Creates a new instance of gui */
 	public gui(/* declare any argument you need*/) {
 		// initialize any variable you need
@@ -72,7 +73,8 @@ public class gui extends gameBoard{
 		try{
 			int serverPort = 4504;
 			System.out.println("Request to connect to server");
-			Socket s = new Socket("localhost", serverPort);  
+			Socket s = new Socket("localhost", serverPort); 
+			serverDown=false;
 			System.out.println("Connection set");
 			// If the server process is not on localhost, for instance on 508AA-PC10,
 			// while the client is on 508AA-PC-09, then we would have 
@@ -99,6 +101,7 @@ public class gui extends gameBoard{
 
 		}catch (Exception e) {
 			
+			serverDown=true;
 			//Multicast that server has failed
 			//send round number+port number etc
 			//get all other processes round+port etc
@@ -115,9 +118,14 @@ public class gui extends gameBoard{
 			//switch this processes server info to match the new server
 		}
 
-
 		// END OF REQUIRED MODIFICATION ***********************************
 
 		setNewWord();   // display the new game
+	}
+	
+	public boolean serverDown(){
+		return serverDown;
+		
+		
 	}
 }
