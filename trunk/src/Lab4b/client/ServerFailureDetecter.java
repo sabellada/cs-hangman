@@ -35,8 +35,8 @@ public class ServerFailureDetecter implements Runnable{
             	
             	//if mygameboard.serverFailed
             	if(myGameBoard.serverDown()){
-            		
-            		//byte[] message=new String(myGameBoard.getRound());
+            		byte[] message=new byte[32];
+            		//message=new String(myGameBoard.getRound());
     		        DatagramPacket messageToSend = new DatagramPacket(message, message.length, group, 6501);
     		        multicastChannel.send(messageToSend);	
             	}else{            	
