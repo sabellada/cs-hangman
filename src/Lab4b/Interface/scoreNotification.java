@@ -7,7 +7,7 @@ package Lab4b.Interface;
 
 /**
  *
- * @author Jerome
+ * @author Joe Oommen and Riley Onabigon
  */
 public interface scoreNotification extends java.rmi.Remote {
 	

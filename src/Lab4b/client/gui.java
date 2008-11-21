@@ -21,7 +21,7 @@ import Lab3.server.ConnectionHandler;
 import gui.gameBoard;
 /**
  *
- * @author Jerome
+ * @author Joe Oommen and Riley Onabigon
  */
 public class gui extends gameBoard{
 	// this class must extend gameBoard
