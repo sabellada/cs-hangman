@@ -88,7 +88,8 @@ public class gui extends gameBoard{
 				 pageContent+=new String(buffer);
 			 }
 			 in.close();
-			 updateAllPlayersScore(parseWord(pageContent)) ;
+			 updateAllPlayersScore((parseWord(pageContent))
+					 .replace(";", "\n").replace(":", "\t")) ;
 
 		
 	}
