@@ -10,6 +10,9 @@
 package Lab4b.client;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.net.Socket;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -26,8 +29,8 @@ import gui.gameBoard;
 public class gui extends gameBoard{
 	// this class must extend gameBoard
 	private int round = 0;
-
-	private boolean serverDown;
+	int serverPort;
+	
 	/** Creates a new instance of gui */
 	public gui(/* declare any argument you need*/) {
 		// initialize any variable you need
@@ -41,6 +44,8 @@ public class gui extends gameBoard{
 		Thread scoreReader=new Thread( new ScoreReader(this));
 		scoreReader.start();
 		
+		Thread serverFailureDeterter=new Thread( new ServerFailureDetecter(this));
+		serverFailureDeterter.start();
 		
 	}
 	
@@ -71,10 +76,9 @@ public class gui extends gameBoard{
 			// the new word to the variable 'theWord';
 
 		try{
-			int serverPort = 4504;
+			serverPort = 4504;
 			System.out.println("Request to connect to server");
 			Socket s = new Socket("localhost", serverPort); 
-			serverDown=false;
 			System.out.println("Connection set");
 			// If the server process is not on localhost, for instance on 508AA-PC10,
 			// while the client is on 508AA-PC-09, then we would have 
@@ -84,7 +88,7 @@ public class gui extends gameBoard{
 			// to the server. After the server executes the method "accept", the connection is set.
 
 
-			// Bound the in/out streams to the socket
+			// Bind the in/out streams to the socket
 			DataInputStream in = new DataInputStream( s.getInputStream());
 			DataOutputStream out =new DataOutputStream( s.getOutputStream());
 
@@ -101,7 +105,8 @@ public class gui extends gameBoard{
 
 		}catch (Exception e) {
 			
-			serverDown=true;
+			serverDown();
+			
 			//Multicast that server has failed
 			//send round number+port number etc
 			//get all other processes round+port etc
@@ -123,9 +128,42 @@ public class gui extends gameBoard{
 		setNewWord();   // display the new game
 	}
 	
-	public boolean serverDown(){
-		return serverDown;
+	public void serverDown(){
 		
+		System.out.println("Unable to connect to server, notifying other clients");
+		
+		try{
+			MulticastSocket MulticastChannel =null;
+	
+	        InetAddress group = InetAddress.getByName("228.5.6.8");  
+	        // must use a multicast address
+	        
+	        // create a socket on any available port ... we are not receiving
+	        MulticastChannel = new MulticastSocket();
+	        
+	        // When sending only a multicast message, joining a multicast group is not required
+	        //MulticastChannel.joinGroup(group);  
+	
+	        // multicast is based on UDP ... so same datagram structure
+	        String round=new String(this.round+"");
+	        byte [] message = round.getBytes();
+	        // Note that the message MUST contain the port on which the receivers
+	        // are listening.
+	        DatagramPacket messageToSend = new DatagramPacket(message, message.length, group, 6500);
+	        MulticastChannel.send(messageToSend);	
+	
+	        // if we did not join the group, then we must not call 'leaveGroup'
+	        //MulticastChannel.leaveGroup(group);  
+	
+	        MulticastChannel.close();        		      	
+	    }catch(Exception e){
+	        e.printStackTrace();
+	    }
 		
 	}
+	
+	public void findLeader(){
+		System.out.println("Server Down, finding backup");
+	}
+
 }
