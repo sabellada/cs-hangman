@@ -21,7 +21,7 @@ public class ServerFailureDetecter implements Runnable{
             MulticastSocket multicastChannel =null;
 
             // A group is identified by its multicast address
-            group = InetAddress.getByName("228.5.6.7");
+            group = InetAddress.getByName("228.5.6.8");
             // create a socket on the specified port
             multicastChannel = new MulticastSocket(6501);
             // 'map' the socket to the multicast group
@@ -32,23 +32,12 @@ public class ServerFailureDetecter implements Runnable{
 
             
             for(;;){            
-            	
-            	//if mygameboard.serverFailed
-            	if(myGameBoard.serverDown()){
-            		byte[] message=new byte[32];
-            		//message=new String(myGameBoard.getRound());
-    		        DatagramPacket messageToSend = new DatagramPacket(message, message.length, group, 6501);
-    		        multicastChannel.send(messageToSend);	
-            	}else{            	
-            	
+            	      	           	
 		            byte[] messageReceived = new byte[32];
 		            messageIn = new DatagramPacket(messageReceived, messageReceived.length);
-		            
-		            //PUT TIMEOUT!!!
-		            
 		            multicastChannel.receive(messageIn);
 		            
-		            findLeader();
+		            myGameBoard.findLeader();
 		            
 		            //End timeout
 		            //if this process is the leader
@@ -58,7 +47,6 @@ public class ServerFailureDetecter implements Runnable{
 		            //    
             	}
 		            
-            } 
             
 		}catch(Exception e){
             	e.printStackTrace();
@@ -66,8 +54,5 @@ public class ServerFailureDetecter implements Runnable{
 	}
 
 
-	private void findLeader() {
 
-		
-	}
 }
