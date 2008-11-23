@@ -41,6 +41,8 @@ public class gui extends gameBoard{
 		// in the interface. You need to call it only once.
 		init();
 		
+		serverPort = 4504;
+		
 		Thread scoreReader=new Thread( new ScoreReader(this));
 		scoreReader.start();
 		
@@ -76,7 +78,6 @@ public class gui extends gameBoard{
 			// the new word to the variable 'theWord';
 
 		try{
-			serverPort = 4504;
 			System.out.println("Request to connect to server");
 			Socket s = new Socket("localhost", serverPort); 
 			System.out.println("Connection set");
@@ -131,7 +132,9 @@ public class gui extends gameBoard{
 	public void serverDown(){
 		
 		System.out.println("Unable to connect to server, notifying other clients");
-		
+
+
+		//send round to all toehr clients
 		try{
 			MulticastSocket MulticastChannel =null;
 	
@@ -159,11 +162,17 @@ public class gui extends gameBoard{
 	    }catch(Exception e){
 	        e.printStackTrace();
 	    }
+	    
+		//assume that you are the new leader until a
+		//finding a game with a higher round
+	    
 		
 	}
 	
 	public void findLeader(){
 		System.out.println("Server Down, finding backup");
+
+		
 	}
 
 }
