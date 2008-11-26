@@ -10,10 +10,13 @@
 package Lab4b.client;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
@@ -30,6 +33,8 @@ public class gui extends gameBoard{
 	// this class must extend gameBoard
 	private int round = 0;
 	int serverPort;
+	boolean serverUp;
+	boolean isBackup;
 	
 	/** Creates a new instance of gui */
 	public gui(/* declare any argument you need*/) {
@@ -42,7 +47,8 @@ public class gui extends gameBoard{
 		init();
 		
 		serverPort = 4504;
-		
+		serverUp=true;
+		isBackup=false;
 		Thread scoreReader=new Thread( new ScoreReader(this));
 		scoreReader.start();
 		
@@ -55,19 +61,21 @@ public class gui extends gameBoard{
 
 	@Override
 	public void resetGameBoard() {
-		try{
 			
-			/*----------------------RPC to send scores-------------------------*/
-			Registry registry = LocateRegistry.getRegistry("localhost",2010);
-			// create the object which is only the INTERFACE
-			// Note that the object is identified by its name 'myObjectName'
-			// which the name used by the server when binding it to the registry
-			scoreNotification obj = (scoreNotification)registry.lookup("myObjectName");
-			
-			obj.notify(getPlayerName(), getCurrentScore());
-			/*----------------------END of RPC---------------------------------*/
-		}catch (Exception e) {}
-			
+		if(serverUp){
+			try{
+				
+				/*----------------------RPC to send scores-------------------------*/
+				Registry registry = LocateRegistry.getRegistry("localhost",2010);
+				// create the object which is only the INTERFACE
+				// Note that the object is identified by its name 'myObjectName'
+				// which the name used by the server when binding it to the registry
+				scoreNotification obj = (scoreNotification)registry.lookup("myObjectName");
+				
+				obj.notify(getPlayerName(), getCurrentScore());
+				/*----------------------END of RPC---------------------------------*/
+			}catch (Exception e) {}
+		}	
 			// clean up the previous game;
 			cleanUp();      
 			
@@ -76,52 +84,43 @@ public class gui extends gameBoard{
 			// BEGINING OF REQUIRED MODIFICATION ******************************
 			// contact the server in order to get the word to guess then assign
 			// the new word to the variable 'theWord';
-
-		try{
-			System.out.println("Request to connect to server");
-			Socket s = new Socket("localhost", serverPort); 
-			System.out.println("Connection set");
-			// If the server process is not on localhost, for instance on 508AA-PC10,
-			// while the client is on 508AA-PC-09, then we would have 
-			// Socket s = new Socket("508AA-PC10", serverPort);  
-
-			// When creating this Socket, the system tries to set a connection
-			// to the server. After the server executes the method "accept", the connection is set.
-
-
-			// Bind the in/out streams to the socket
-			DataInputStream in = new DataInputStream( s.getInputStream());
-			DataOutputStream out =new DataOutputStream( s.getOutputStream());
-
-
-			out.writeInt(round);
-
-			String wordFromServer = in.readUTF(); 
-			theWord=wordFromServer;
-
-			round++;
-			System.out.println("Received: "+ wordFromServer) ; 
-			System.out.println("Current Round Number: "+ round) ;
-			/*-----------------------END connect to server--------------------*/
-
-		}catch (Exception e) {
+		if(serverUp){
+			try{
+				System.out.println("Request to connect to server");
+				Socket s = new Socket("localhost", serverPort); 
+				System.out.println("Connection set");
+				// If the server process is not on localhost, for instance on 508AA-PC10,
+				// while the client is on 508AA-PC-09, then we would have 
+				// Socket s = new Socket("508AA-PC10", serverPort);  
+	
+				// When creating this Socket, the system tries to set a connection
+				// to the server. After the server executes the method "accept", the connection is set.
+	
+	
+				// Bind the in/out streams to the socket
+				DataInputStream in = new DataInputStream( s.getInputStream());
+				DataOutputStream out =new DataOutputStream( s.getOutputStream());
+	
+	
+				out.writeInt(round);
+	
+				String wordFromServer = in.readUTF(); 
+				theWord=wordFromServer;
+	
+				round++;
+				System.out.println("Received: "+ wordFromServer) ; 
+				System.out.println("Current Round Number: "+ round) ;
+				/*-----------------------END connect to server--------------------*/
+	
+			}catch (Exception e) {
+					//set that the server is down;
+					serverUp=false;
+					serverDown();	
+			}
+		}else if(!serverUp&isBackup){
+			updateDebugArea("Cannot continue until main server is restored");
+		}else{
 			
-			serverDown();
-			
-			//Multicast that server has failed
-			//send round number+port number etc
-			//get all other processes round+port etc
-			//figure out which process is the new server
-			
-			//if this process is the new server
-			//scan for server restarting
-			//if server has restarted
-			//
-			//disable new words
-			
-			//else if other process is new server
-			//notify new process 
-			//switch this processes server info to match the new server
 		}
 
 		// END OF REQUIRED MODIFICATION ***********************************
@@ -129,20 +128,39 @@ public class gui extends gameBoard{
 		setNewWord();   // display the new game
 	}
 	
-	public void serverDown(){
+	public void serverDown() {
 		
-		System.out.println("Unable to connect to server, notifying other clients");
+		
+		updateDebugArea("Unable to connect to server, notifying other clients");
+		multicastRound();
 
 
+		//assume that you are the new leader until a
+		//finding a game with a higher round
+	    
+		
+	}
+	
+	public void findLeader(DatagramPacket messageIn){
+		updateDebugArea("Server Down");
+		String round=new String(messageIn.getData());
+		updateDebugArea("Recieved "+round.trim()+" from "+messageIn.getPort());
+		
+		//int start=pageContent.indexOf("<response>")+10;
+		//int end=pageContent.indexOf("</response>");
+		//return pageContent.substring(start, end); 
+
+		
+	}
+	
+	public void multicastRound(){
 		//send round to all toehr clients
 		try{
-			MulticastSocket MulticastChannel =null;
+			MulticastSocket MulticastChannel =new MulticastSocket();
 	
 	        InetAddress group = InetAddress.getByName("228.5.6.8");  
 	        // must use a multicast address
-	        
-	        // create a socket on any available port ... we are not receiving
-	        MulticastChannel = new MulticastSocket();
+
 	        
 	        // When sending only a multicast message, joining a multicast group is not required
 	        //MulticastChannel.joinGroup(group);  
@@ -152,7 +170,7 @@ public class gui extends gameBoard{
 	        byte [] message = round.getBytes();
 	        // Note that the message MUST contain the port on which the receivers
 	        // are listening.
-	        DatagramPacket messageToSend = new DatagramPacket(message, message.length, group, 6500);
+	        DatagramPacket messageToSend = new DatagramPacket(message, message.length, group, 6501);
 	        MulticastChannel.send(messageToSend);	
 	
 	        // if we did not join the group, then we must not call 'leaveGroup'
@@ -162,17 +180,9 @@ public class gui extends gameBoard{
 	    }catch(Exception e){
 	        e.printStackTrace();
 	    }
-	    
-		//assume that you are the new leader until a
-		//finding a game with a higher round
-	    
-		
 	}
-	
-	public void findLeader(){
-		System.out.println("Server Down, finding backup");
 
-		
-	}
+
+
 
 }

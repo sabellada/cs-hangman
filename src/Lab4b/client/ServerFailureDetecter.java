@@ -7,8 +7,6 @@ import java.net.MulticastSocket;
 public class ServerFailureDetecter implements Runnable{
 	
 	gui myGameBoard;
-	DatagramPacket messageIn;
-	InetAddress group;
 	
 	public ServerFailureDetecter(gui myGameBoard){
 		this.myGameBoard=myGameBoard;
@@ -21,7 +19,7 @@ public class ServerFailureDetecter implements Runnable{
             MulticastSocket multicastChannel =null;
 
             // A group is identified by its multicast address
-            group = InetAddress.getByName("228.5.6.8");
+            InetAddress group = InetAddress.getByName("228.5.6.8");
             // create a socket on the specified port
             multicastChannel = new MulticastSocket(6501);
             // 'map' the socket to the multicast group
@@ -34,10 +32,12 @@ public class ServerFailureDetecter implements Runnable{
             for(;;){            
             	      	           	
 		            byte[] messageReceived = new byte[32];
-		            messageIn = new DatagramPacket(messageReceived, messageReceived.length);
+		            DatagramPacket messageIn = new DatagramPacket(messageReceived, messageReceived.length);
 		            multicastChannel.receive(messageIn);
+		            myGameBoard.findLeader(messageIn);
 		            
-		            myGameBoard.findLeader();
+
+		            
 		            
 		            //End timeout
 		            //if this process is the leader
