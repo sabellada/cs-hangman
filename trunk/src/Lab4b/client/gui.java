@@ -32,10 +32,13 @@ import gui.gameBoard;
 public class gui extends gameBoard{
 	// this class must extend gameBoard
 	private int round = 0;
+	int highestRound;
 	int serverPort;
+	InetAddress serverAddress;
 	boolean serverUp;
 	boolean isBackup;
-	
+	boolean atMaxRound;
+	WordsMonitor words; 
 	/** Creates a new instance of gui */
 	public gui(/* declare any argument you need*/) {
 		// initialize any variable you need
@@ -49,6 +52,10 @@ public class gui extends gameBoard{
 		serverPort = 4504;
 		serverUp=true;
 		isBackup=false;
+		atMaxRound=false;
+		
+		words=new WordsMonitor();
+		
 		Thread scoreReader=new Thread( new ScoreReader(this));
 		scoreReader.start();
 		
@@ -86,6 +93,7 @@ public class gui extends gameBoard{
 			// the new word to the variable 'theWord';
 		if(serverUp){
 			try{
+				serverPort=4504;
 				System.out.println("Request to connect to server");
 				Socket s = new Socket("localhost", serverPort); 
 				System.out.println("Connection set");
@@ -106,8 +114,10 @@ public class gui extends gameBoard{
 	
 				String wordFromServer = in.readUTF(); 
 				theWord=wordFromServer;
-	
+				words.addWord(theWord);
+				
 				round++;
+				highestRound=round;
 				System.out.println("Received: "+ wordFromServer) ; 
 				System.out.println("Current Round Number: "+ round) ;
 				/*-----------------------END connect to server--------------------*/
@@ -117,10 +127,22 @@ public class gui extends gameBoard{
 					serverUp=false;
 					serverDown();	
 			}
-		}else if(!serverUp&isBackup){
-			updateDebugArea("Cannot continue until main server is restored");
+		}else if(!serverUp&(round==highestRound)){
+			updateDebugArea("Cannot continue until main server is restored\n");
 		}else{
-			
+			try {
+				//create new datagram socket
+				DatagramSocket roundSocket =  new DatagramSocket();
+				/*------------------CLOSE OLD BACKUP SERVER-----------------------------------*/
+	            String currentRound = new String(""+round);
+	            DatagramPacket roundPacket = new DatagramPacket(currentRound.getBytes(), currentRound.length(),
+	                                    serverAddress, serverPort);
+	            
+					roundSocket.send(roundPacket);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
 		// END OF REQUIRED MODIFICATION ***********************************
@@ -130,11 +152,16 @@ public class gui extends gameBoard{
 	
 	public void serverDown() {
 		
+		updateDebugArea("\n Unable to connect to server, notifying all clients\n");
 		
-		updateDebugArea("Unable to connect to server, notifying other clients");
-		multicastRound();
+		try{
+			DatagramSocket backupSocket =  new DatagramSocket(); 
+			multicastRound(backupSocket);
 
+			Thread backupServer=new Thread( new BackupServer(this, backupSocket, words));
+			backupServer.start();
 
+		}catch(Exception e){} 
 		//assume that you are the new leader until a
 		//finding a game with a higher round
 	    
@@ -142,20 +169,57 @@ public class gui extends gameBoard{
 	}
 	
 	public void findLeader(DatagramPacket messageIn){
-		updateDebugArea("Server Down");
-		String round=new String(messageIn.getData());
-		round=round.trim();
-		int recievedRound=round.hashCode()-48;
-		updateDebugArea("Recieved "+round.trim());
+		updateDebugArea("\n Server Down\n");
+		serverUp=false;
 		
-		//int start=pageContent.indexOf("<response>")+10;
-		//int end=pageContent.indexOf("</response>");
-		//return pageContent.substring(start, end); 
+		String message=new String(messageIn.getData());
+		message=message.trim();
 
+		//get round and port number of client claiming poistion of new server	
+		int firstSpace=message.indexOf(" ");
+		Integer messageRound=new Integer(message.substring(0,firstSpace).trim());
+		Integer messagePort=new Integer(message.substring(firstSpace+1).trim());
+		updateDebugArea("Recieved "+messageRound.toString()+" from "+messagePort.toString()+messageIn.getAddress()+"\n");
+		
+		//if other client does have a higher round keep it as the server
+		if(messageRound.intValue()>highestRound){
+			atMaxRound=false;
+			highestRound=messageRound.intValue();
+			serverPort=messagePort.intValue();
+			serverAddress=messageIn.getAddress();
+		//if equal cannot continue anyways so wait for main server to come back
+		}else if(messageRound.intValue()==highestRound){
+			atMaxRound=true;
+		//if smaller than our round assume we're the backup until a higher round comes
+		}else if(messageRound.intValue()<round){
+			atMaxRound=true;
+			try {
+				
+				//create new datagram socket
+				DatagramSocket backupSocket =  new DatagramSocket();
+				/*------------------CLOSE OLD BACKUP SERVER-----------------------------------*/
+                String close = "close";
+                DatagramPacket closeBackup = new DatagramPacket(close.getBytes(), close.length(),
+                                        messageIn.getAddress(), messagePort.intValue());
+                backupSocket.send(closeBackup);
+                /*----------------------BACKUP SERVER CLOSED---------------------------------*/
+                
+                //multicast that you are the new server
+                multicastRound(backupSocket);
+                /*--------------------------START NEW SERVER BACKUP THREAD------------------*/
+    			Thread backupServer=new Thread( new BackupServer(this, backupSocket, words));
+    			backupServer.start();
+    			
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
+			
+		}//else do nothing since we already have a server with a higher round
 		
 	}
 	
-	public void multicastRound(){
+	public void multicastRound(DatagramSocket backupSocket){
 		//send round to all toehr clients
 		try{
 			MulticastSocket MulticastChannel =new MulticastSocket();
@@ -168,7 +232,7 @@ public class gui extends gameBoard{
 	        //MulticastChannel.joinGroup(group);  
 	
 	        // multicast is based on UDP ... so same datagram structure
-	        String round=new String(this.round+"");
+	        String round=new String(this.round+" "+backupSocket.getLocalPort());
 	        byte [] message = round.getBytes();
 	        // Note that the message MUST contain the port on which the receivers
 	        // are listening.
@@ -182,6 +246,10 @@ public class gui extends gameBoard{
 	    }catch(Exception e){
 	        e.printStackTrace();
 	    }
+	}
+	
+	public void stopBackup(){
+		
 	}
 
 
