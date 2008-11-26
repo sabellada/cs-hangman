@@ -144,7 +144,9 @@ public class gui extends gameBoard{
 	public void findLeader(DatagramPacket messageIn){
 		updateDebugArea("Server Down");
 		String round=new String(messageIn.getData());
-		updateDebugArea("Recieved "+round.trim()+" from "+messageIn.getPort());
+		round=round.trim();
+		int recievedRound=round.hashCode()-48;
+		updateDebugArea("Recieved "+round.trim());
 		
 		//int start=pageContent.indexOf("<response>")+10;
 		//int end=pageContent.indexOf("</response>");
