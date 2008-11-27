@@ -15,6 +15,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.rmi.registry.LocateRegistry;
@@ -93,7 +94,6 @@ public class gui extends gameBoard{
 			// the new word to the variable 'theWord';
 		if(serverUp){
 			try{
-				serverPort=4504;
 				System.out.println("Request to connect to server");
 				Socket s = new Socket("localhost", serverPort); 
 				System.out.println("Connection set");
@@ -155,7 +155,7 @@ public class gui extends gameBoard{
 		updateDebugArea("\n Unable to connect to server, notifying all clients\n");
 		
 		try{
-			DatagramSocket backupSocket =  new DatagramSocket(); 
+			ServerSocket backupSocket = new ServerSocket(0);
 			multicastRound(backupSocket);
 
 			Thread backupServer=new Thread( new BackupServer(this, backupSocket, words));
@@ -196,19 +196,19 @@ public class gui extends gameBoard{
 			try {
 				
 				//create new datagram socket
-				DatagramSocket backupSocket =  new DatagramSocket();
+				ServerSocket backupSocket = new ServerSocket(0);
 				/*------------------CLOSE OLD BACKUP SERVER-----------------------------------*/
-                String close = "close";
-                DatagramPacket closeBackup = new DatagramPacket(close.getBytes(), close.length(),
-                                        messageIn.getAddress(), messagePort.intValue());
-                backupSocket.send(closeBackup);
+                //String close = "close";
+                //DatagramPacket closeBackup = new DatagramPacket(close.getBytes(), close.length(),
+                //messageIn.getAddress(), messagePort.intValue());
+                //backupSocket.send(closeBackup);
                 /*----------------------BACKUP SERVER CLOSED---------------------------------*/
                 
                 //multicast that you are the new server
                 multicastRound(backupSocket);
                 /*--------------------------START NEW SERVER BACKUP THREAD------------------*/
-    			Thread backupServer=new Thread( new BackupServer(this, backupSocket, words));
-    			backupServer.start();
+    			//Thread backupServer=new Thread( new BackupServer(this, backupSocket, words));
+    			//backupServer.start();
     			
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -219,7 +219,7 @@ public class gui extends gameBoard{
 		
 	}
 	
-	public void multicastRound(DatagramSocket backupSocket){
+	public void multicastRound(ServerSocket backupSocket){
 		//send round to all toehr clients
 		try{
 			MulticastSocket MulticastChannel =new MulticastSocket();
