@@ -2,36 +2,40 @@ package Lab4b.client;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+import Lab4b.server.ConnectionHandler;
 
 public class BackupServer implements Runnable{
 
-	DatagramSocket backupSocket;
+	ServerSocket FrontDesk;
 	 WordsMonitor words; 
 	 gui gui;
 	
-	public BackupServer(gui gui, DatagramSocket backupSocket2, WordsMonitor words2) {
-		this.backupSocket=backupSocket;
+
+
+	public BackupServer(gui gui, ServerSocket FrontDesk,
+			WordsMonitor words) {
+		this.FrontDesk=FrontDesk;
 		this.words=words;
 		this.gui=gui;
 	}
 
 	public void run() {
 		try{
-			System.out.println("\n"+backupSocket.getLocalPort());
+			gui.updateDebugArea("\n Starting backup Server\n");
 			for(;;){
-		        byte[] round = new byte[50];
-		        DatagramPacket reply = new DatagramPacket(round, round.length);	
-		        backupSocket.receive(reply);
-		        String message=new String(reply.getData());
-		        
-		        if(message.contains("close")){
-		        	gui.updateDebugArea("Settign client with higher round as new server\n");
-		        	backupSocket.close();
-		        	break;
-		        }
-		        
-		        System.out.println("Round: " + message +" received");
-		        gui.updateDebugArea("Round: " + message +" received");
+				while(true) {
+
+					// a client requests to connect to server
+					System.out.println("Waiting for request to connect ");
+					Socket ConnectionToOneClient = FrontDesk.accept(); 
+					System.out.println("Connect accepted");
+
+					
+					//ConnectionToOneClient.close();	//End of the conversation close the connection to the client
+				}
 			}
 		}catch(Exception e){}
 		
