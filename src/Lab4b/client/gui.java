@@ -23,6 +23,7 @@ import java.rmi.registry.Registry;
 
 import Lab2.Interface.scoreNotification;
 import Lab3.server.ConnectionHandler;
+import Lab4b.server.WordsMonitor;
 
 
 import gui.gameBoard;
@@ -39,7 +40,7 @@ public class gui extends gameBoard{
 	boolean serverUp;
 	boolean isBackup;
 	boolean atMaxRound;
-	WordsMonitor words; 
+	BackupWordsMonitor words; 
 	/** Creates a new instance of gui */
 	public gui(/* declare any argument you need*/) {
 		// initialize any variable you need
@@ -55,7 +56,7 @@ public class gui extends gameBoard{
 		isBackup=false;
 		atMaxRound=false;
 		
-		words=new WordsMonitor();
+		words=new BackupWordsMonitor();
 		
 		Thread scoreReader=new Thread( new ScoreReader(this));
 		scoreReader.start();
@@ -92,7 +93,7 @@ public class gui extends gameBoard{
 			// BEGINING OF REQUIRED MODIFICATION ******************************
 			// contact the server in order to get the word to guess then assign
 			// the new word to the variable 'theWord';
-		if(serverUp){
+		if(serverUp||(round!=highestRound)){
 			try{
 				System.out.println("Request to connect to server");
 				Socket s = new Socket("localhost", serverPort); 
@@ -158,7 +159,7 @@ public class gui extends gameBoard{
 			ServerSocket backupSocket = new ServerSocket(0);
 			multicastRound(backupSocket);
 
-			Thread backupServer=new Thread( new BackupServer(this, backupSocket, words));
+			Thread backupServer=new Thread(BackupServer(this, backupSocket, words));
 			backupServer.start();
 
 		}catch(Exception e){} 
@@ -168,6 +169,8 @@ public class gui extends gameBoard{
 		
 	}
 	
+
+
 	public void findLeader(DatagramPacket messageIn){
 		updateDebugArea("\n Server Down\n");
 		serverUp=false;
@@ -207,8 +210,8 @@ public class gui extends gameBoard{
                 //multicast that you are the new server
                 multicastRound(backupSocket);
                 /*--------------------------START NEW SERVER BACKUP THREAD------------------*/
-    			//Thread backupServer=new Thread( new BackupServer(this, backupSocket, words));
-    			//backupServer.start();
+                Thread backupServer=new Thread(BackupServer(this,backupSocket,words));
+    			backupServer.start();
     			
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
