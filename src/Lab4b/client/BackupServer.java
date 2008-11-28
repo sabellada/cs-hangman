@@ -23,7 +23,6 @@ public class BackupServer implements Runnable{
 
 	public void run() {
 		try{
-			gui.updateDebugArea("\n Starting backup Server\n");
 			for(;;){
 				while(true) {
 

@@ -138,17 +138,23 @@ public class gui extends gameBoard{
 	public void serverDown() {
 		
 		updateDebugArea("\n Unable to connect to server, notifying all clients\n");
+		//the highest known round is the round you're one
 		highestRound=round;
+		//this client is the first one to detect the problem
 		first=true;
 		try{
+			//dynamically assign a socket tfor the backup server
 			ServerSocket backupSocket = new ServerSocket(0);
+			//multicast the server port and round number to all other clients 
 			multicastRound(backupSocket);
 			
+			//start a backup server
 			Thread backupServer=new Thread( new BackupServer(this, backupSocket, words));
 			backupServer.start();
 
 		}catch(Exception e){} 
 		
+		//start a thread to detect when the main server is restored
 		Thread serverRestorer=new Thread( new ServerRestorer());
 		serverRestorer.start();
 	    
@@ -156,14 +162,16 @@ public class gui extends gameBoard{
 	}
 	
 	public void findLeader(DatagramPacket messageIn){
+		//if this is the first message received set your highest round to your current round
 		if(highestRound==0)highestRound=round;
 		updateDebugArea("\n Server Down\n");
 		serverUp=false;
 		
+		//get string from message
 		String message=new String(messageIn.getData());
 		message=message.trim();
 
-		//get round and port number of client claiming poistion of new server	
+		//parse round and port number of client claiming position of new server	
 		int firstSpace=message.indexOf(" ");
 		Integer messageRound=new Integer(message.substring(0,firstSpace).trim());
 		Integer messagePort=new Integer(message.substring(firstSpace+1).trim());
@@ -176,6 +184,7 @@ public class gui extends gameBoard{
 			serverPort=messagePort.intValue();
 			serverAddress=messageIn.getAddress();
 			
+			//if message received that original server is back up
 			if(messagePort.intValue()==4504){
 				serverUp=true;
 				if(highestRound==round){
@@ -243,8 +252,8 @@ public class gui extends gameBoard{
 	    }
 	}
 	
-	public void stopBackup(){
-		
+	public boolean serverUp(){
+		return serverUp;
 	}
 
 
