@@ -44,7 +44,7 @@ public class ServerRestorer implements Runnable{
 	        //MulticastChannel.joinGroup(group);  
 	
 	        // multicast is based on UDP ... so same datagram structure
-	        String round=new String(100000+" "+serverPort);
+	        String round=new String(Integer.MAX_VALUE+" "+serverPort);
 	        byte [] message = round.getBytes();
 	        // Note that the message MUST contain the port on which the receivers
 	        // are listening.
