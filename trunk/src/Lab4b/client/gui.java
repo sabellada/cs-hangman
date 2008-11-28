@@ -127,6 +127,8 @@ public class gui extends gameBoard{
 					//set that the server is down;
 					serverDown();	
 			}
+		}else{
+			resetGameBoard();
 		}
 
 		// END OF REQUIRED MODIFICATION ***********************************
