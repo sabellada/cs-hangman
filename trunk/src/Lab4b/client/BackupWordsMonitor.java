@@ -5,12 +5,11 @@ import java.util.*;
 import server.words;
 
 
-public class WordsMonitor {
+public class BackupWordsMonitor {
 	
 	//contains the list of all words generated
 	ArrayList<String> wordList = new ArrayList<String>();
-	//generates new words
-	words nextWord=new words();
+
 	//keeps track of the last round in the list
 	int last=0;
 
