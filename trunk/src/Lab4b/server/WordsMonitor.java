@@ -16,7 +16,7 @@ public class WordsMonitor {
 
 	public synchronized String getNext(int round){
 		//if first client to get to this round add a new word
-		if(round>=last){
+		while(round>=last){
 			wordList.add(nextWord.next());
 			last++;		
 		}
@@ -26,5 +26,7 @@ public class WordsMonitor {
 		
 		
 	}
+
+
 
 }
